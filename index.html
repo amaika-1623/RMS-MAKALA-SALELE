@@ -361,7 +361,30 @@
 </div>
 
 <script>
-    // 1. Klok en Datum Logica
+    let activeAlarm = null;
+
+    // Audio functie om een wekkertoon te genereren met de browser (Web Audio API)
+    function playAlarmSound() {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // Toonhoogte (A5)
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 1.5); // Laat de toon 1.5 seconde duren
+        } catch (e) {
+            console.log("Audio niet ondersteund door browser");
+        }
+    }
+
+    // 1. Klok, Datum en Wekkercontrole Logica
     function updateClock() {
         const now = new Date();
         const seconds = now.getSeconds();
@@ -377,7 +400,18 @@
         document.getElementById('hourHand').style.transform = `rotate(${hourDeg}deg)`;
 
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('digitalDateDisplay').innerText = now.toLocaleDateString('nl-NL', options) + ' - ' + now.toLocaleTimeString('nl-NL');
+        const timeString = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
+        document.getElementById('digitalDateDisplay').innerText = now.toLocaleDateString('nl-NL', options) + ' - ' + timeString + ':' + String(seconds).padStart(2, '0');
+
+        // Controleer of de wekker moet afgaan
+        if (activeAlarm && activeAlarm === timeString && seconds === 0) {
+            playAlarmSound();
+            document.getElementById('alarmStatus').innerText = `🔔 WEKKER GAAT AF (${timeString})!`;
+            document.getElementById('alarmStatus').style.color = "#ff4444";
+            
+            // Optioneel: activeer ook direct de stream/radio als de wekker gaat
+            document.getElementById('playBtn').click();
+        }
     }
     setInterval(updateClock, 1000);
     updateClock();
@@ -435,14 +469,16 @@
         document.getElementById('mediaOutput').innerHTML = `<div class="status-text">Speler gestopt</div>`;
     });
 
-    // 3. Wekker Logica
+    // 3. Wekker Instellen Logica
     document.getElementById('setAlarmBtn').addEventListener('click', function() {
         const alarmTime = document.getElementById('alarmTime').value;
         const statusDiv = document.getElementById('alarmStatus');
         if (alarmTime) {
+            activeAlarm = alarmTime;
             statusDiv.innerText = `Wekker ingesteld om ${alarmTime} uur`;
             statusDiv.style.color = "#f3e5ab";
         } else {
+            activeAlarm = null;
             statusDiv.innerText = `Geen wekker ingesteld`;
             statusDiv.style.color = "#c5a059";
         }
