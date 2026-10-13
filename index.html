@@ -215,7 +215,7 @@
             text-align: center;
         }
         th { color: #f3e5ab; }
-        td.today {
+        td.today-cell {
             background: #d4af37;
             color: #0b0804;
             font-weight: bold;
@@ -334,12 +334,12 @@
                 <option value="10">November</option>
                 <option value="11">December</option>
             </select>
-            <input type="number" id="yearInput" value="2026" style="flex: 1; text-align: center;" />
+            <input type="number" id="yearInput" style="flex: 1; text-align: center;" />
         </div>
         <button id="goToYearBtn" style="width: 100%; margin-top: 5px;">Ga naar jaar</button>
         
         <div id="calendarContainer" style="margin-top: 10px;">
-            <div style="font-size: 13px; font-weight: bold; color: #f3e5ab;" id="calMonthYearTitle">Oktober 2026</div>
+            <div style="font-size: 13px; font-weight: bold; color: #f3e5ab;" id="calMonthYearTitle">Laden...</div>
             <table>
                 <thead>
                     <tr>
@@ -486,7 +486,7 @@
         }
     });
 
-    // 4. Eeuwkalender Logica (Dynamisch voor Vandaag en elk gewenst jaar/maand)
+    // 4. Eeuwkalender Logica (Altijd automatisch op vandaag)
     function generateCalendar(year, month) {
         const body = document.getElementById('calendarBody');
         body.innerHTML = '';
@@ -518,7 +518,7 @@
                     row += '<td></td>';
                 } else {
                     let isToday = (date === currentDate && month === currentMonth && year === currentYear);
-                    let classAttr = isToday ? 'class="today"' : '';
+                    let classAttr = isToday ? 'class="today-cell"' : '';
                     row += `<td ${classAttr}>${date}</td>`;
                     date++;
                 }
@@ -529,13 +529,11 @@
         }
         body.innerHTML = html;
 
-        // Update tekst bij geselecteerde datum
         const selDate = new Date(year, month, (year === currentYear && month === currentMonth) ? currentDate : 1);
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('selectedDateInfo').innerText = "Geselecteerde datum: " + selDate.toLocaleDateString('nl-NL', options);
     }
 
-    // Knoppen voor de kalender
     document.getElementById('goToYearBtn').addEventListener('click', function() {
         const m = parseInt(document.getElementById('monthSelect').value);
         const y = parseInt(document.getElementById('yearInput').value);
@@ -547,7 +545,7 @@
         generateCalendar(now.getFullYear(), now.getMonth());
     });
 
-    // Start kalender op huidige maand & jaar
+    // Start direct op de werkelijke huidige datum van vandaag
     const now = new Date();
     generateCalendar(now.getFullYear(), now.getMonth());
 </script>
