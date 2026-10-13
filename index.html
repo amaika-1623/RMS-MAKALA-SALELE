@@ -339,5 +339,80 @@
     generateCalendar(2026, 9);
 </script>
 
+<script>
+    // Synchroniseer de zender-selectie met het invoerveld
+    const stationSelect = document.getElementById('stationSelect');
+    if (stationSelect) {
+        stationSelect.addEventListener('change', function() {
+            document.getElementById('mediaUrl').value = this.value;
+        });
+    }
+
+    // Play knop functionaliteit
+    document.getElementById('playBtn').addEventListener('click', function() {
+        const urlInput = document.getElementById('mediaUrl').value.trim();
+        let outputDiv = document.getElementById('mediaOutput');
+        
+        // Als mediaOutput nog niet bestaat in je HTML, maken we deze dynamisch aan
+        if (!outputDiv) {
+            outputDiv = document.createElement('div');
+            outputDiv.id = 'mediaOutput';
+            document.getElementById('mediaUrl').parentNode.appendChild(outputDiv);
+        }
+
+        if (!urlInput) {
+            outputDiv.innerHTML = `<div style="font-size:11px; font-style:italic; color:red; margin-top:5px;">Voer een URL in</div>`;
+            return;
+        }
+
+        // Controleer op YouTube links (behandelt direct youtu.be/ en youtube.com/)
+        if (urlInput.includes("youtube.com") || urlInput.includes("youtu.be")) {
+            let videoId = "";
+            
+            if (urlInput.includes("youtu.be/")) {
+                videoId = urlInput.split("youtu.be/")[1].split("?")[0].split("&")[0];
+            } else if (urlInput.includes("watch?v=")) {
+                videoId = urlInput.split("watch?v=")[1].split("&")[0];
+            }
+            
+            if (videoId) {
+                outputDiv.innerHTML = `
+                    <div style="margin-top:10px;">
+                        <iframe width="100%" height="180" 
+                            src="https://www.youtube.com/embed/${videoId}?autoplay=1" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen 
+                            style="border: 1px solid #d4af37; border-radius: 6px;">
+                        </iframe>
+                        <div style="font-size:11px; font-style:italic; color:#c5a059; margin-top:5px;">Live videostream actief</div>
+                    </div>
+                `;
+            } else {
+                outputDiv.innerHTML = `<div style="font-size:11px; font-style:italic; color:red; margin-top:5px;">Kon YouTube video-ID niet laden</div>`;
+            }
+        } else {
+            // Behandel overige links als een audiostream/radiostream
+            outputDiv.innerHTML = `
+                <div style="margin-top:10px;">
+                    <audio id="audioStream" controls autoplay style="width:100%;">
+                        <source src="${urlInput}" type="audio/mpeg">
+                        Je browser ondersteunt dit audio-element niet.
+                    </audio>
+                    <div style="font-size:11px; font-style:italic; color:#c5a059; margin-top:5px;">Audiostream actief</div>
+                </div>
+            `;
+        }
+    });
+
+    // Stop knop functionaliteit
+    document.getElementById('stopBtn').addEventListener('click', function() {
+        let outputDiv = document.getElementById('mediaOutput');
+        if (outputDiv) {
+            outputDiv.innerHTML = `<div style="font-size:11px; font-style:italic; color:#c5a059; margin-top:5px;">Speler gestopt</div>`;
+        }
+    });
+</script>
+
 </body>
 </html>
