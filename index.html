@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mena Muria Klok & Eeuwkalender</title>
+    <style>
+        body {
+            background-color: #0b0804;
+            color: #d4af37;
+            font-family: 'Times New Roman', serif, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 10px;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            border: 1px solid #d4af37;
+            border-radius: 12px;
+            padding: 15px;
+            background: #110d06;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+        h1 {
+            font-size: 20px;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            color: #f3e5ab;
+        }
+        .subtitle {
+            font-size: 11px;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            color: #c5a059;
+        }
+        .section-box {
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 15px;
+            background: #0f0a05;
+        }
+        .section-title {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        select, input[type="text"], button {
+            background-color: #1a1205;
+            color: #f3e5ab;
+            border: 1px solid #d4af37;
+            padding: 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin: 4px 0;
+            box-sizing: border-box;
+        }
+        select, input[type="text"] {
+            width: 100%;
+        }
+        button {
+            cursor: pointer;
+            font-weight: bold;
+            background: linear-gradient(to bottom, #d4af37, #aa820a);
+            color: #0b0804;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        #mediaOutput {
+            margin-top: 10px;
+        }
+        iframe {
+            border-radius: 6px;
+            border: 1px solid #d4af37;
+            width: 100%;
+            height: 180px;
+        }
+        .status-text {
+            font-size: 11px;
+            font-style: italic;
+            margin-top: 5px;
+            color: #c5a059;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>MENA MURIA</h1>
+    <div class="subtitle">KLOK • RADIO STREAM • EEUWKALENDER</div>
+
+    <!-- Klok sectie (vereenvoudigd voorbeeld) -->
+    <div class="section-box">
+        <div style="font-size: 24px; font-weight: bold;" id="clockDisplay">12:11:49</div>
+        <div class="status-text" id="dateDisplay">dinsdag 13 oktober 2026</div>
+    </div>
+
+    <!-- Stream & Speler Sectie -->
+    <div class="section-box">
+        <div class="section-title">📻 STREAM & RADIO SPELER</div>
+        
+        <select id="stationSelect">
+            <option value="https://youtu.be/TEhNMG2du8k">YouTube Stream (Voorbeeld)</option>
+            <option value="https://icecast.omroep.nl/radio1-bb-mp3">Radio 1 (Audio)</option>
+        </select>
+
+        <input type="text" id="mediaUrl" value="https://youtu.be/TEhNMG2du8k" placeholder="Plak YouTube of Stream URL hier..." />
+        
+        <div style="display: flex; gap: 5px;">
+            <button id="playBtn" style="flex: 1;">▶ Play</button>
+            <button id="stopBtn" style="flex: 1;">⏹ Stop</button>
+        </div>
+
+        <!-- Dynamische output voor video of audio -->
+        <div id="mediaOutput">
+            <div class="status-text" id="playerStatus">Speler gereed</div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Synchroniseer dropdown met invoerveld
+    document.getElementById('stationSelect').addEventListener('change', function() {
+        document.getElementById('mediaUrl').value = this.value;
+    });
+
+    // Play knop functionaliteit met automatische YouTube check
+    document.getElementById('playBtn').addEventListener('click', function() {
+        const urlInput = document.getElementById('mediaUrl').value.trim();
+        const outputDiv = document.getElementById('mediaOutput');
+        
+        if (!urlInput) {
+            outputDiv.innerHTML = `<div class="status-text" style="color:red;">Voer eerst een link in</div>`;
+            return;
+        }
+
+        // Controleer of het een YouTube link is (zowel youtu.be als youtube.com)
+        if (urlInput.includes("youtube.com") || urlInput.includes("youtu.be")) {
+            let videoId = "";
+            
+            if (urlInput.includes("youtu.be/")) {
+                videoId = urlInput.split("youtu.be/")[1].split("?")[0];
+            } else if (urlInput.includes("watch?v=")) {
+                videoId = urlInput.split("watch?v=")[1].split("&")[0];
+            }
+            
+            if (videoId) {
+                // Bouw de juiste embed iframe met autoplay
+                outputDiv.innerHTML = `
+                    <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                    <div class="status-text">Live videostream actief</div>
+                `;
+            } else {
+                outputDiv.innerHTML = `<div class="status-text" style="color:red;">Kon YouTube ID niet vinden</div>`;
+            }
+        } else {
+            // Behandel het als een gewone audio- of radiostream
+            outputDiv.innerHTML = `
+                <audio id="audioStream" controls autoplay style="width:100%; margin-top:5px;">
+                    <source src="${urlInput}" type="audio/mpeg">
+                    Je browser ondersteunt geen audio.
+                </audio>
+                <div class="status-text">Audio speler actief</div>
+            `;
+        }
+    });
+
+    // Stop knop functionaliteit
+    document.getElementById('stopBtn').addEventListener('click', function() {
+        const outputDiv = document.getElementById('mediaOutput');
+        outputDiv.innerHTML = `<div class="status-text" id="playerStatus">Speler gestopt</div>`;
+    });
+
+    // Eenvoudige live klok logica
+    setInterval(() => {
+        const now = new Date();
+        document.getElementById('clockDisplay').innerText = now.toLocaleTimeString('nl-NL');
+    }, 1000);
+</script>
+
+</body>
+</html>
