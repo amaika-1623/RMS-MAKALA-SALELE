@@ -48,7 +48,7 @@
             letter-spacing: 1px;
         }
 
-        /* RMS ANALOGE KLOK STYLING */
+        /* ANALOGE RMS KLOK */
         .clock-container {
             position: relative;
             width: 260px;
@@ -60,7 +60,6 @@
             box-shadow: inset 0 0 15px #000, 0 0 12px rgba(212, 175, 55, 0.4);
         }
 
-        /* Cijfers op de klok */
         .clock-number {
             position: absolute;
             font-weight: bold;
@@ -70,7 +69,6 @@
             transform: translate(-50%, -50%);
         }
 
-        /* Teksten en RMS Logo op het klokoppervlak */
         .clock-face-details {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -82,7 +80,7 @@
         }
         .text-top {
             position: absolute;
-            top: 50px;
+            top: 48px;
             font-size: 10px;
             letter-spacing: 1px;
             color: #f3e5ab;
@@ -90,43 +88,64 @@
         }
         .text-mena {
             position: absolute;
-            top: 65px;
+            top: 63px;
             font-size: 14px;
             font-weight: bold;
             color: #f3e5ab;
             letter-spacing: 2px;
         }
         
-        /* RMS Vlag met Vleugels Embleem */
-        .rms-emblem {
+        /* RMS Vlag met Vleugels Container */
+        .flag-emblem {
             position: absolute;
-            top: 92px;
-            width: 140px;
-            height: 40px;
-        }
-        
-        .text-numbers {
-            position: absolute;
-            top: 135px;
-            width: 130px;
+            top: 88px;
+            width: 150px;
+            height: 38px;
             display: flex;
             justify-content: space-between;
-            font-size: 11px;
+            align-items: center;
+        }
+        
+        /* Linker- en rechtervleugel opgebouwd uit de 4 RMS-kleuren */
+        .wing-left, .wing-right {
+            width: 65px;
+            height: 28px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 0 4px rgba(0,0,0,0.8);
+        }
+        .wing-left { transform: skewY(12deg); }
+        .wing-right { transform: skewY(-12deg); }
+
+        .stripe-blue { background-color: #0033cc; height: 7px; }
+        .stripe-white { background-color: #ffffff; height: 7px; }
+        .stripe-green { background-color: #008800; height: 7px; }
+        .stripe-red { background-color: #cc0000; height: 7px; }
+
+        .text-numbers {
+            position: absolute;
+            top: 132px;
+            width: 120px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
             font-weight: bold;
             color: #f3e5ab;
         }
         .text-muria {
             position: absolute;
-            top: 155px;
-            font-size: 13px;
+            top: 152px;
+            font-size: 14px;
             font-weight: bold;
             color: #f3e5ab;
             letter-spacing: 2px;
         }
         .text-date {
             position: absolute;
-            top: 173px;
-            font-size: 9px;
+            top: 172px;
+            font-size: 10px;
             color: #c5a059;
             letter-spacing: 1px;
         }
@@ -223,25 +242,26 @@
             <div class="clock-number" style="top: 29%; left: 14%;">10</div>
             <div class="clock-number" style="top: 15%; left: 29%;">11</div>
 
-            <!-- Teksten & RMS Vlag / Embleem op de Klok -->
+            <!-- Teksten & RMS Vlag -->
             <div class="clock-face-details">
                 <div class="text-top">LEA LOHI SAMASURU</div>
                 <div class="text-mena">★ MENA ★</div>
                 
-                <!-- SVG RMS Vlag Vleugels Embleem -->
-                <svg class="rms-emblem" viewBox="0 0 140 40">
-                    <!-- Linkervleugel (Blauw, Wit, Groen, Rood) -->
-                    <path d="M 10 20 Q 35 10 65 20 Q 35 25 10 20 Z" fill="#0033aa"/>
-                    <path d="M 12 23 Q 35 15 65 20 Q 35 28 12 23 Z" fill="#ffffff"/>
-                    <path d="M 14 26 Q 35 20 65 20 Q 35 31 14 26 Z" fill="#008800"/>
-                    <path d="M 16 29 Q 35 25 65 20 Q 35 34 16 29 Z" fill="#cc0000"/>
-                    
-                    <!-- Rechtervleugel (Blauw, Wit, Groen, Rood) -->
-                    <path d="M 130 20 Q 105 10 75 20 Q 105 25 130 20 Z" fill="#0033aa"/>
-                    <path d="M 128 23 Q 105 15 75 20 Q 105 28 128 23 Z" fill="#ffffff"/>
-                    <path d="M 126 26 Q 105 20 75 20 Q 105 31 126 26 Z" fill="#008800"/>
-                    <path d="M 124 29 Q 105 25 75 20 Q 105 34 124 29 Z" fill="#cc0000"/>
-                </svg>
+                <!-- RMS Vlagkleuren (Blauw, Wit, Groen, Rood) -->
+                <div class="flag-emblem">
+                    <div class="wing-left">
+                        <div class="stripe-blue"></div>
+                        <div class="stripe-white"></div>
+                        <div class="stripe-green"></div>
+                        <div class="stripe-red"></div>
+                    </div>
+                    <div class="wing-right">
+                        <div class="stripe-blue"></div>
+                        <div class="stripe-white"></div>
+                        <div class="stripe-green"></div>
+                        <div class="stripe-red"></div>
+                    </div>
+                </div>
 
                 <div class="text-numbers">
                     <span>25</span>
@@ -371,7 +391,6 @@
             return;
         }
 
-        // Automatische omzetting van YouTube-links (youtu.be / youtube.com)
         if (urlInput.includes("youtube.com") || urlInput.includes("youtu.be")) {
             let videoId = "";
             if (urlInput.includes("youtu.be/")) {
@@ -395,7 +414,6 @@
                 outputDiv.innerHTML = `<div class="status-text" style="color:red;">Kon YouTube ID niet verwerken</div>`;
             }
         } else {
-            // Radio/Audio player
             outputDiv.innerHTML = `
                 <div style="margin-top:10px;">
                     <audio id="audioStream" controls autoplay style="width:100%;">
