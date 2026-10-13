@@ -1,6 +1,49 @@
 <!DOCTYPE html>
 <html lang="nl">
-<head>
+<head><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Mena Muria Klok, Radio, Wekker & Kalender</title>
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MM Klok">
+  <meta name="theme-color" content="#0f0d0b">
+
+  <link rel="manifest" href='data:application/manifest+json,{"name":"Mena Muria Klok","short_name":"MM Klok","start_url":".","display":"standalone","background_color":"#0f0d0b","theme_color":"#0f0d0b","orientation":"portrait"}'>
+
+  <style>
+    :root {
+      --bg-color: #0f0d0b;
+      --gold-light: #f5d77f;
+      --gold-mid: #c89d2a;
+      --gold-dark: #826211;
+      --rms-blue: #0033a0;
+      --rms-white: #ffffff;
+      --rms-green: #007a33;
+      --rms-red: #d52b1e;
+      --card-bg: #14100c;
+      --border-color: #4a3822;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--bg-color);
+      color: var(--gold-light);
+      font-family: 'Georgia', 'Times New Roman', serif;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch;
+    }
+
+      
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mena Muria Klok & Eeuwkalender</title>
