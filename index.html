@@ -106,7 +106,6 @@
             align-items: center;
         }
         
-        /* Linker- en rechtervleugel opgebouwd uit de 4 RMS-kleuren */
         .wing-left, .wing-right {
             width: 65px;
             height: 28px;
@@ -175,7 +174,7 @@
         }
 
         /* Formulieren & Knoppen */
-        select, input[type="text"], input[type="number"], button {
+        select, input[type="text"], input[type="number"], input[type="time"], button {
             background-color: #1a1205;
             color: #f3e5ab;
             border: 1px solid #d4af37;
@@ -185,7 +184,7 @@
             margin: 4px 0;
             box-sizing: border-box;
         }
-        select, input[type="text"] { width: 100%; }
+        select, input[type="text"], input[type="time"] { width: 100%; }
         button {
             cursor: pointer;
             font-weight: bold;
@@ -228,7 +227,6 @@
     <!-- ANALOGE RMS KLOK -->
     <div class="section-box">
         <div class="clock-container">
-            <!-- Cijfers 1 t/m 12 -->
             <div class="clock-number" style="top: 10%; left: 50%;">12</div>
             <div class="clock-number" style="top: 15%; left: 71%;">1</div>
             <div class="clock-number" style="top: 29%; left: 86%;">2</div>
@@ -242,12 +240,10 @@
             <div class="clock-number" style="top: 29%; left: 14%;">10</div>
             <div class="clock-number" style="top: 15%; left: 29%;">11</div>
 
-            <!-- Teksten & RMS Vlag -->
             <div class="clock-face-details">
                 <div class="text-top">LEA LOHI SAMASURU</div>
                 <div class="text-mena">★ MENA ★</div>
                 
-                <!-- RMS Vlagkleuren (Blauw, Wit, Groen, Rood) -->
                 <div class="flag-emblem">
                     <div class="wing-left">
                         <div class="stripe-blue"></div>
@@ -271,7 +267,6 @@
                 <div class="text-date">25-04-1950</div>
             </div>
 
-            <!-- Wijzers -->
             <div class="hand hour-hand" id="hourHand"></div>
             <div class="hand minute-hand" id="minuteHand"></div>
             <div class="hand second-hand" id="secondHand"></div>
@@ -284,7 +279,7 @@
 
     <!-- STREAM & RADIO SPELER SECTIE -->
     <div class="section-box">
-        <div class="section-title">📻 STREAM PLAYER</div>
+        <div class="section-title">📻 STREAM & RADIO SPELER</div>
         
         <select id="stationSelect">
             <option value="https://youtu.be/TEhNMG2du8k">YouTube Stream (Voorbeeld)</option>
@@ -301,6 +296,16 @@
         <div id="mediaOutput">
             <div class="status-text" id="playerStatus">Speler gereed</div>
         </div>
+    </div>
+
+    <!-- WEKKER / ALARM SECTIE -->
+    <div class="section-box">
+        <div class="section-title">⏰ WEKKER / ALARM</div>
+        <div style="display: flex; gap: 5px;">
+            <input type="time" id="alarmTime" value="07:00" style="flex: 2;" />
+            <button id="setAlarmBtn" style="flex: 1;">Zet Wekker</button>
+        </div>
+        <div class="status-text" id="alarmStatus">Geen wekker ingesteld</div>
     </div>
 
     <!-- EEUWKALENDER SECTIE -->
@@ -430,7 +435,20 @@
         document.getElementById('mediaOutput').innerHTML = `<div class="status-text">Speler gestopt</div>`;
     });
 
-    // 3. Kalender Logica
+    // 3. Wekker Logica
+    document.getElementById('setAlarmBtn').addEventListener('click', function() {
+        const alarmTime = document.getElementById('alarmTime').value;
+        const statusDiv = document.getElementById('alarmStatus');
+        if (alarmTime) {
+            statusDiv.innerText = `Wekker ingesteld om ${alarmTime} uur`;
+            statusDiv.style.color = "#f3e5ab";
+        } else {
+            statusDiv.innerText = `Geen wekker ingesteld`;
+            statusDiv.style.color = "#c5a059";
+        }
+    });
+
+    // 4. Kalender Logica
     function generateCalendar(year, month) {
         const body = document.getElementById('calendarBody');
         body.innerHTML = '';
