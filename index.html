@@ -34,6 +34,38 @@
             margin-bottom: 15px;
             color: #c5a059;
         }
+        /* Analoge Klok Styling */
+        .clock-box {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            margin: 10px auto;
+            background: radial-gradient(circle, #2a1f10 0%, #0d0904 100%);
+            border: 3px solid #d4af37;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+        }
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom;
+            background: #d4af37;
+            border-radius: 4px;
+        }
+        .hour-hand { width: 4px; height: 60px; background: #f3e5ab; margin-left: -2px; }
+        .minute-hand { width: 3px; height: 85px; background: #d4af37; margin-left: -1.5px; }
+        .second-hand { width: 1px; height: 95px; background: #ff4444; margin-left: -0.5px; }
+        .center-dot {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 12px; height: 12px;
+            background: #8b0000;
+            border: 2px solid #d4af37;
+            border-radius: 50%;
+            margin: -7px 0 0 -7px;
+        }
+
         .section-box {
             border: 1px solid #d4af37;
             border-radius: 8px;
@@ -47,7 +79,7 @@
             margin-bottom: 8px;
             letter-spacing: 1px;
         }
-        select, input[type="text"], button {
+        select, input[type="text"], input[type="number"], button {
             background-color: #1a1205;
             color: #f3e5ab;
             border: 1px solid #d4af37;
@@ -92,6 +124,7 @@
         th, td {
             padding: 5px;
             font-size: 12px;
+            text-align: center;
         }
         th {
             color: #f3e5ab;
@@ -104,10 +137,17 @@
     <h1>MENA MURIA</h1>
     <div class="subtitle">KLOK • RADIO STREAM • EEUWKALENDER</div>
 
-    <!-- Klok sectie -->
+    <!-- Analoge Klok Sectie -->
     <div class="section-box">
-        <div style="font-size: 24px; font-weight: bold;" id="clockDisplay">12:11:49</div>
-        <div class="status-text" id="dateDisplay">dinsdag 13 oktober 2026</div>
+        <div class="clock-box">
+            <!-- Wijzers voor de analoge klok -->
+            <div class="hand hour-hand" id="hourHand"></div>
+            <div class="hand minute-hand" id="minuteHand"></div>
+            <div class="hand second-hand" id="secondHand"></div>
+            <div class="center-dot"></div>
+        </div>
+        <div class="section-title" style="margin-top: 10px;">ABORU</div>
+        <div class="status-text" id="digitalDateDisplay">dinsdag 13 oktober 2026 - 18:27:47</div>
     </div>
 
     <!-- Stream & Speler Sectie -->
@@ -237,13 +277,31 @@
         outputDiv.innerHTML = `<div class="status-text" id="playerStatus">Speler gestopt</div>`;
     });
 
-    // Live klok
-    setInterval(() => {
+    // Analoge klok en datum updaten
+    function updateClock() {
         const now = new Date();
-        document.getElementById('clockDisplay').innerText = now.toLocaleTimeString('nl-NL');
-    }, 1000);
+        
+        const seconds = now.getSeconds();
+        const minutes = now.getMinutes();
+        const hours = now.getHours();
 
-    // Eenvoudige kalender generator voor de maandweergave
+        const secondDeg = seconds * 6;
+        const minuteDeg = minutes * 6 + seconds * 0.1;
+        const hourDeg = (hours % 12) * 30 + minutes * 0.5;
+
+        document.getElementById('secondHand').style.transform = `rotate(${secondDeg}deg)`;
+        document.getElementById('minuteHand').style.transform = `rotate(${minuteDeg}deg)`;
+        document.getElementById('hourHand').style.transform = `rotate(${hourDeg}deg)`;
+
+        // Datum tekst onder klok
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('digitalDateDisplay').innerText = now.toLocaleDateString('nl-NL', options) + ' - ' + now.toLocaleTimeString('nl-NL');
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Eenvoudige kalender generator
     function generateCalendar(year, month) {
         const body = document.getElementById('calendarBody');
         body.innerHTML = '';
@@ -251,7 +309,7 @@
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
         
-        let startDay = firstDay.getDay() - 1; // Maandag als eerste dag
+        let startDay = firstDay.getDay() - 1;
         if (startDay === -1) startDay = 6;
         
         let date = 1;
@@ -265,7 +323,7 @@
                 } else if (date > lastDay.getDate()) {
                     row += '<td></td>';
                 } else {
-                    let isToday = (date === 13 && month === 9 && year === 2026); // Voorbeeld huidige datum markering
+                    let isToday = (date === 13 && month === 9 && year === 2026);
                     let style = isToday ? 'background: #d4af37; color: #0b0804; font-weight: bold; border-radius: 50%;' : '';
                     row += `<td style="${style}">${date}</td>`;
                     date++;
@@ -278,7 +336,7 @@
         body.innerHTML = html;
     }
 
-    generateCalendar(2026, 9); // Initialiseer op Oktober 2026
+    generateCalendar(2026, 9);
 </script>
 
 </body>
