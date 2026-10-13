@@ -95,7 +95,6 @@
             letter-spacing: 2px;
         }
         
-        /* RMS Vlag met Vleugels Container */
         .flag-emblem {
             position: absolute;
             top: 88px;
@@ -216,6 +215,12 @@
             text-align: center;
         }
         th { color: #f3e5ab; }
+        td.today {
+            background: #d4af37;
+            color: #0b0804;
+            font-weight: bold;
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body>
@@ -274,7 +279,7 @@
         </div>
 
         <div style="font-size: 16px; font-weight: bold; letter-spacing: 2px; margin-top: 8px;">ABORU</div>
-        <div class="status-text" id="digitalDateDisplay">dinsdag 13 oktober 2026 - 12:11:09</div>
+        <div class="status-text" id="digitalDateDisplay">Laden...</div>
     </div>
 
     <!-- STREAM & RADIO SPELER SECTIE -->
@@ -325,7 +330,7 @@
                 <option value="6">Juli</option>
                 <option value="7">Augustus</option>
                 <option value="8">September</option>
-                <option value="9" selected>Oktober</option>
+                <option value="9">Oktober</option>
                 <option value="10">November</option>
                 <option value="11">December</option>
             </select>
@@ -354,7 +359,7 @@
         </div>
         
         <div class="status-text" id="selectedDateInfo" style="margin-top: 10px; border-top: 1px dashed #d4af37; padding-top: 5px;">
-            Geselecteerde datum: Dinsdag 13 Oktober 2026
+            Geselecteerde datum: Laden...
         </div>
     </div>
 
@@ -362,8 +367,8 @@
 
 <script>
     let activeAlarm = null;
+    const months = ["Januari", "Februari", "Maart", "April", "Mei", "Juni", "Juli", "Augustus", "September", "Oktober", "November", "December"];
 
-    // Audio functie om een wekkertoon te genereren met de browser (Web Audio API)
     function playAlarmSound() {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -371,20 +376,20 @@
             const gainNode = audioCtx.createGain();
 
             oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // Toonhoogte (A5)
+            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
             gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
 
             oscillator.connect(gainNode);
             gainNode.connect(audioCtx.destination);
 
             oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 1.5); // Laat de toon 1.5 seconde duren
+            oscillator.stop(audioCtx.currentTime + 1.5);
         } catch (e) {
-            console.log("Audio niet ondersteund door browser");
+            console.log("Audio niet ondersteund");
         }
     }
 
-    // 1. Klok, Datum en Wekkercontrole Logica
+    // 1. Klok & Live Datum
     function updateClock() {
         const now = new Date();
         const seconds = now.getSeconds();
@@ -403,20 +408,17 @@
         const timeString = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
         document.getElementById('digitalDateDisplay').innerText = now.toLocaleDateString('nl-NL', options) + ' - ' + timeString + ':' + String(seconds).padStart(2, '0');
 
-        // Controleer of de wekker moet afgaan
         if (activeAlarm && activeAlarm === timeString && seconds === 0) {
             playAlarmSound();
             document.getElementById('alarmStatus').innerText = `🔔 WEKKER GAAT AF (${timeString})!`;
             document.getElementById('alarmStatus').style.color = "#ff4444";
-            
-            // Optioneel: activeer ook direct de stream/radio als de wekker gaat
             document.getElementById('playBtn').click();
         }
     }
     setInterval(updateClock, 1000);
     updateClock();
 
-    // 2. Stream & Video Player Logica
+    // 2. Stream & Video Player
     document.getElementById('stationSelect').addEventListener('change', function() {
         document.getElementById('mediaUrl').value = this.value;
     });
@@ -469,7 +471,7 @@
         document.getElementById('mediaOutput').innerHTML = `<div class="status-text">Speler gestopt</div>`;
     });
 
-    // 3. Wekker Instellen Logica
+    // 3. Wekker Instellen
     document.getElementById('setAlarmBtn').addEventListener('click', function() {
         const alarmTime = document.getElementById('alarmTime').value;
         const statusDiv = document.getElementById('alarmStatus');
@@ -484,11 +486,16 @@
         }
     });
 
-    // 4. Kalender Logica
+    // 4. Eeuwkalender Logica (Dynamisch voor Vandaag en elk gewenst jaar/maand)
     function generateCalendar(year, month) {
         const body = document.getElementById('calendarBody');
         body.innerHTML = '';
         
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth();
+        const currentDate = today.getDate();
+
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
         
@@ -497,7 +504,11 @@
         
         let date = 1;
         let html = '';
-        
+
+        document.getElementById('monthSelect').value = month;
+        document.getElementById('yearInput').value = year;
+        document.getElementById('calMonthYearTitle').innerText = `${months[month]} ${year}`;
+
         for (let i = 0; i < 6; i++) {
             let row = '<tr>';
             for (let j = 0; j < 7; j++) {
@@ -506,9 +517,9 @@
                 } else if (date > lastDay.getDate()) {
                     row += '<td></td>';
                 } else {
-                    let isToday = (date === 13 && month === 9 && year === 2026);
-                    let style = isToday ? 'background: #d4af37; color: #0b0804; font-weight: bold; border-radius: 50%;' : '';
-                    row += `<td style="${style}">${date}</td>`;
+                    let isToday = (date === currentDate && month === currentMonth && year === currentYear);
+                    let classAttr = isToday ? 'class="today"' : '';
+                    row += `<td ${classAttr}>${date}</td>`;
                     date++;
                 }
             }
@@ -517,8 +528,28 @@
             if (date > lastDay.getDate()) break;
         }
         body.innerHTML = html;
+
+        // Update tekst bij geselecteerde datum
+        const selDate = new Date(year, month, (year === currentYear && month === currentMonth) ? currentDate : 1);
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('selectedDateInfo').innerText = "Geselecteerde datum: " + selDate.toLocaleDateString('nl-NL', options);
     }
-    generateCalendar(2026, 9);
+
+    // Knoppen voor de kalender
+    document.getElementById('goToYearBtn').addEventListener('click', function() {
+        const m = parseInt(document.getElementById('monthSelect').value);
+        const y = parseInt(document.getElementById('yearInput').value);
+        generateCalendar(y, m);
+    });
+
+    document.getElementById('todayBtn').addEventListener('click', function() {
+        const now = new Date();
+        generateCalendar(now.getFullYear(), now.getMonth());
+    });
+
+    // Start kalender op huidige maand & jaar
+    const now = new Date();
+    generateCalendar(now.getFullYear(), now.getMonth());
 </script>
 
 </body>
