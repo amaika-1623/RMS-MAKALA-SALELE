@@ -172,6 +172,29 @@
             z-index: 12;
         }
 
+        /* SPECIALE DIGITALE KLOK KADER STYLING */
+        .digital-clock-card {
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            background: #0d0904;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.8);
+        }
+        .digital-date-text {
+            font-size: 13px;
+            color: #c5a059;
+            margin-bottom: 6px;
+            font-style: normal;
+        }
+        .digital-time-text {
+            font-size: 28px;
+            font-weight: bold;
+            color: #f3e5ab;
+            letter-spacing: 3px;
+            font-family: 'Times New Roman', serif;
+        }
+
         /* Formulieren & Knoppen */
         select, input[type="text"], input[type="number"], input[type="time"], button {
             background-color: #1a1205;
@@ -278,8 +301,13 @@
             <div class="center-dot"></div>
         </div>
 
-        <div style="font-size: 16px; font-weight: bold; letter-spacing: 2px; margin-top: 8px;">ABORU</div>
-        <div class="status-text" id="digitalDateDisplay">Laden...</div>
+        <div style="font-size: 20px; font-weight: bold; letter-spacing: 2px; margin-top: 12px; color: #f3e5ab;">ABORU</div>
+
+        <!-- MOOIE DIGITALE TIJD KADER ZOALS OP JE AFBEELDING -->
+        <div class="digital-clock-card">
+            <div class="digital-date-text" id="digitalDateOnly">Laden...</div>
+            <div class="digital-time-text" id="digitalTimeOnly">00 : 00 : 00</div>
+        </div>
     </div>
 
     <!-- STREAM & RADIO SPELER SECTIE -->
@@ -389,7 +417,7 @@
         }
     }
 
-    // 1. Klok & Live Datum
+    // 1. Klok & Live Tijd + Datum
     function updateClock() {
         const now = new Date();
         const seconds = now.getSeconds();
@@ -404,13 +432,19 @@
         document.getElementById('minuteHand').style.transform = `rotate(${minuteDeg}deg)`;
         document.getElementById('hourHand').style.transform = `rotate(${hourDeg}deg)`;
 
+        // Datum opmaken
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const timeString = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
-        document.getElementById('digitalDateDisplay').innerText = now.toLocaleDateString('nl-NL', options) + ' - ' + timeString + ':' + String(seconds).padStart(2, '0');
+        document.getElementById('digitalDateOnly').innerText = now.toLocaleDateString('nl-NL', options);
 
-        if (activeAlarm && activeAlarm === timeString && seconds === 0) {
+        // Tijd opmaken (HH : MM : SS)
+        const timeString = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        document.getElementById('digitalTimeOnly').innerText = timeString;
+
+        // Wekker controle
+        const alarmCheckString = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
+        if (activeAlarm && activeAlarm === alarmCheckString && seconds === 0) {
             playAlarmSound();
-            document.getElementById('alarmStatus').innerText = `🔔 WEKKER GAAT AF (${timeString})!`;
+            document.getElementById('alarmStatus').innerText = `🔔 WEKKER GAAT AF (${alarmCheckString})!`;
             document.getElementById('alarmStatus').style.color = "#ff4444";
             document.getElementById('playBtn').click();
         }
@@ -486,7 +520,7 @@
         }
     });
 
-    // 4. Eeuwkalender Logica (Altijd automatisch op vandaag)
+    // 4. Eeuwkalender Logica
     function generateCalendar(year, month) {
         const body = document.getElementById('calendarBody');
         body.innerHTML = '';
@@ -545,7 +579,6 @@
         generateCalendar(now.getFullYear(), now.getMonth());
     });
 
-    // Start direct op de werkelijke huidige datum van vandaag
     const now = new Date();
     generateCalendar(now.getFullYear(), now.getMonth());
 </script>
